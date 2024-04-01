@@ -6,9 +6,9 @@ package ex02;
 import java.io.*;
 import java.util.Scanner;
 
-/**
- * Клас для демонстрації в діалоговому режимі збереження та відновлення стану об'єкта серіалізації/десеріалізації
- */
+        /**
+        * Клас для демонстрації в діалоговому режимі збереження та відновлення стану об'єкта серіалізації/десеріалізації
+        */
 public class Serialization {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -38,7 +38,7 @@ public class Serialization {
         CalculationResult result = new CalculationResult(baseHeight, rectangleLength, countOnes);
 
         /**
-         * Серіалізує об'єкт `result` із результатами обчислень у файл "calculation_result.ser".
+        * Серіалізує об'єкт `result` із результатами обчислень у файл "calculation_result.ser".
         * Виводить повідомлення про успішну серіалізацію.
         * за допомогою об'єкта ObjectOutputStream. Це відбувається всередині блоку try-with-resources,
         * що автоматично закриває ObjectOutputStream після завершення виконання блоку.
