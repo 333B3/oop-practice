@@ -1,11 +1,11 @@
-package ex02;
+package ex02_03;
 import java.io.*;
 import java.util.Scanner;
 
         /**
         * Клас для демонстрації в діалоговому режимі збереження та відновлення стану об'єкта серіалізації/десеріалізації
         */
-public class Serialization {
+public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -32,6 +32,9 @@ public class Serialization {
          * baseHeight, rectangleLength і countOnes, і присвоює цей об'єкт змінній result.
          */
         CalculationResult result = new CalculationResult(baseHeight, rectangleLength, countOnes);
+        
+        ViewResult viewResult = new ViewResult();
+        viewResult.calculateAndSaveResult(baseHeight, rectangleLength);
 
         /**
         * Серіалізує об'єкт `result` із результатами обчислень у файл "calculation_result.ser".

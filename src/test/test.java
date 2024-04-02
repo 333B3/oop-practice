@@ -1,22 +1,23 @@
 package test;
-import ex02.*;
-import java.util.Scanner;
+
+import java.io.IOException;
+import ex02_03.ViewResult;
 
 public class test {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        // Вхідні параметри
-        int baseHeight = 5;
-        int rectangleLength = 4;
+        // Тестуємо ініціалізацію та виведення результатів
+        System.out.println("Тестуємо ініціалізацію та виведення результатів:");
+        ViewResult result = new ViewResult();
+        result.viewShow();
 
-        // Знаходимо кількість одиниць у двійковому поданні суми
-        int countOnes = BinaryCountCalculator.countOnesInBinary(baseHeight, rectangleLength);
-
-        // Виведення результатів
-        System.out.println("Висота основи трикутника: " + baseHeight);
-        System.out.println("Довжина сторони прямокутника: " + rectangleLength);
-        System.out.println("Кількість одиниць у двійковому поданні суми: " + countOnes);
-
-        scanner.close();
+        // Тестуємо збереження результатів у файл та їх відновлення
+        System.out.println("\nТестуємо збереження результатів у файл та їх відновлення:");
+        try {
+            result.viewSave();
+            result.viewRestore();
+            result.viewShow();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Помилка при збереженні та відновленні результатів: " + e.getMessage());
+        }
     }
 }

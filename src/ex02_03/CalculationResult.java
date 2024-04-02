@@ -1,4 +1,4 @@
-package ex02;
+package ex02_03;
 
 import java.io.Serializable;
 
