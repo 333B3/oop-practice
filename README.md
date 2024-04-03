@@ -634,8 +634,14 @@ Main
 ```java
 package ex4;
 
-
+/**
+ * Клас `Main` для демонстрації роботи програми.
+ */
 public class Main {
+    /**
+     * Головний метод програми.
+     * @param args аргументи командного рядка
+     */
     public static void main(String[] args) {
         ViewableResult viewableResult = new ViewableResult();
         View view = viewableResult.getView();
@@ -648,11 +654,25 @@ View
 
 ```java
 package ex4;
-
+/**
+ * Інтерфейс, який оголошує методи для відображення заголовку, тіла, підзаголовку та всіх елементів.
+ */
 public interface View {
+    /**
+     * Метод для відображення заголовку.
+     */
     public void viewHeader();
+    /**
+     * Метод для відображення тіла.
+     */
     public void viewBody();
+    /**
+     * Метод для відображення підзаголовку.
+     */
     public void viewFooter();
+    /**
+     * Метод для відображення всіх елементів.
+     */
     public void viewShow();
 }
 ```
@@ -661,8 +681,16 @@ Viewable
 
 ```java
 package ex4;
-
+/**
+ * Інтерфейс, який визначає метод getView(), який повинен бути реалізований у класах,
+ * що реалізують цей інтерфейс. Метод getView() повертає об'єкт класу View.
+ */
 public interface Viewable {
+    /**
+     * Метод, який повертає об'єкт класу View.
+     *
+     * @return об'єкт класу View
+     */
     public View getView();
 }
 ```
@@ -672,28 +700,42 @@ ViewableResult
 ```java
 package ex4;
 
+/**
+ * Конкретний створювач (Concrete Creator) у шаблоні проектування Factory Method.
+ * Реалізує інтерфейс Viewable, надаючи метод getView(), який повертає новий об'єкт ViewTable.
+ */
 public class ViewableResult implements Viewable {
+    /**
+     * Метод, який повертає новий об'єкт класу ViewTable.
+     *
+     * @return новий об'єкт класу ViewTable
+     */
     @Override
     public View getView() {
-        return new ViewResult();
+        return new ViewTable();
     }
 }
 ```
 
-ViewResult
+ViewTable
 
 ```java
 package ex4;
 
 import java.util.Scanner;
-
-public class ViewResult implements View {
+/**
+ * Клас, який представляє результати обчислень та забезпечує їх відображення.
+ * Реалізує інтерфейс View для створення відображення результатів у вигляді таблиці.
+ */
+public class ViewTable implements View {
     private int baseHeight;
     private int rectangleLength;
     private int countOnes;
     
-
-    public ViewResult() {
+    /**
+     * Конструктор класу, який отримує від користувача вхідні дані та обчислює кількість одиниць.
+     */
+    public ViewTable() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Введіть висоту основи трикутника: ");
@@ -731,7 +773,13 @@ public class ViewResult implements View {
         viewBody();
         viewFooter();
     }
-
+    /**
+     * Метод для обчислення кількості одиниць у двійковому представленні суми периметрів.
+     *
+     * @param baseHeight      висота основи трикутника
+     * @param rectangleLength довжина сторони прямокутника
+     * @return кількість одиниць у двійковому представленні суми периметрів
+     */
     public static int countOnesInBinary(int baseHeight, int rectangleLength) {
         int perimeterTriangle = 2 * (baseHeight + (int) Math.sqrt(Math.pow(baseHeight, 2) + Math.pow(rectangleLength / 2, 2)));
         int perimeterRectangle = 2 * (rectangleLength + baseHeight);

@@ -1,14 +1,19 @@
 package ex4;
 
 import java.util.Scanner;
-
-public class ViewResult implements View {
+/**
+ * Клас, який представляє результати обчислень та забезпечує їх відображення.
+ * Реалізує інтерфейс View для створення відображення результатів у вигляді таблиці.
+ */
+public class ViewTable implements View {
     private int baseHeight;
     private int rectangleLength;
     private int countOnes;
     
-
-    public ViewResult() {
+    /**
+     * Конструктор класу, який отримує від користувача вхідні дані та обчислює кількість одиниць.
+     */
+    public ViewTable() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Введіть висоту основи трикутника: ");
@@ -46,7 +51,13 @@ public class ViewResult implements View {
         viewBody();
         viewFooter();
     }
-
+    /**
+     * Метод для обчислення кількості одиниць у двійковому представленні суми периметрів.
+     *
+     * @param baseHeight      висота основи трикутника
+     * @param rectangleLength довжина сторони прямокутника
+     * @return кількість одиниць у двійковому представленні суми периметрів
+     */
     public static int countOnesInBinary(int baseHeight, int rectangleLength) {
         int perimeterTriangle = 2 * (baseHeight + (int) Math.sqrt(Math.pow(baseHeight, 2) + Math.pow(rectangleLength / 2, 2)));
         int perimeterRectangle = 2 * (rectangleLength + baseHeight);
