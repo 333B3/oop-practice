@@ -801,3 +801,346 @@ public class ViewTable implements View {
 ![](screenshot/ex4.png)
 ### Успішно виконане тестування:
 ![](screenshot/test_ex4.png)
+
+## Завдання 5
+Command
+```java
+package ex5;
+
+/**
+ * Інтерфейс для реалізації команди.
+ */
+public interface Command {
+    void execute();
+
+    void undo();
+}
+```
+CommandHistory
+```java
+package ex5;
+
+import java.util.Stack;
+
+public class CommandHistory {
+    private static CommandHistory instance;
+    private final Stack<Command> commands = new Stack<>();
+
+    private CommandHistory() {}
+
+    public static CommandHistory getInstance() {
+        if (instance == null) {
+            instance = new CommandHistory();
+        }
+        return instance;
+    }
+
+    public void add(Command command) {
+        commands.push(command);
+    }
+
+    public void undo() {
+        if (!commands.isEmpty()) {
+            Command lastCommand = commands.pop();
+            lastCommand.undo();
+        } else {
+            System.out.println("Історія команд порожня.");
+        }
+    }
+}
+
+```
+MacroCommand
+```java
+package ex5;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Реалізація макрокоманди.
+ */
+public class MacroCommand implements Command {
+    private List<Command> commands = new ArrayList<>();
+
+    public void addCommand(Command command) {
+        commands.add(command);
+    }
+
+    @Override
+    public void execute() {
+        for (Command command : commands) {
+            command.execute();
+        }
+    }
+
+    @Override
+    public void undo() {
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            commands.get(i).undo();
+        }
+    }
+}
+```
+Main
+```java
+package ex5;
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ViewTable viewTable = new ViewTable();
+
+        boolean running = true;
+        while (running) {
+            System.out.println("\nМеню:");
+            System.out.println("1. Відобразити таблицю");
+            System.out.println("2. Повторити введення");
+            System.out.println("3. Скасувати останнє введення");
+            System.out.println("4. Вийти");
+
+            System.out.print("Виберіть опцію: ");
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    viewTable.viewShow();
+                    break;
+                case 2:
+                    viewTable.execute();
+                    break;
+                case 3:
+                    viewTable.undo();
+                    break;
+                case 4:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Невідома опція. Спробуйте ще раз.");
+            }
+        }
+
+        scanner.close();
+    }
+}
+```
+Menu
+```java
+package ex5;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Клас, що представляє меню команд.
+ */
+public class Menu {
+    private static Menu instance;
+    private List<Command> commands = new ArrayList<>();
+
+    private Menu() {}
+
+    public static Menu getInstance() {
+        if (instance == null) {
+            instance = new Menu();
+        }
+        return instance;
+    }
+
+    public void addCommand(Command command) {
+        commands.add(command);
+    }
+
+    public void executeCommands() {
+        for (Command command : commands) {
+            command.execute();
+        }
+    }
+
+    public void undoCommands() {
+        for (int i = commands.size() - 1; i >= 0; i--) {
+            commands.get(i).undo();
+        }
+    }
+}
+```
+View
+```java
+package ex5;
+
+public interface View {
+    void viewHeader();
+    void viewBody();
+    void viewFooter();
+    void viewShow();
+}
+
+```
+Viewable
+```java
+package ex5;
+
+/**
+ * Інтерфейс, який визначає метод getView(), який повинен бути реалізований у класах,
+ * що реалізують цей інтерфейс. Метод getView() повертає об'єкт класу View.
+ */
+public interface Viewable {
+    /**
+     * Метод, який повертає об'єкт класу View.
+     *
+     * @return об'єкт класу View
+     */
+    public View getView();
+}
+
+```
+ViewableResult
+```java
+package ex5;
+
+/**
+ * Конкретний створювач (Concrete Creator) у шаблоні проектування Factory Method.
+ * Реалізує інтерфейс Viewable, надаючи метод getView(), який повертає новий об'єкт ViewTable.
+ */
+public class ViewableResult implements Viewable {
+    /**
+     * Метод, який повертає новий об'єкт класу ViewTable.
+     *
+     * @return новий об'єкт класу ViewTable
+     */
+    @Override
+    public View getView() {
+        return new ViewTable();
+    }
+}
+
+```
+ViewTable
+```java
+package ex5;
+
+import java.util.Scanner;
+import java.io.Serializable;
+
+/**
+ * Клас, який представляє результати обчислень та забезпечує їх відображення.
+ * Реалізує інтерфейс View для створення відображення результатів у вигляді таблиці.
+ */
+public class ViewTable implements View, Command, Serializable {
+    private static final long serialVersionUID = 1L;
+    private int baseHeight;
+    private int rectangleLength;
+    private int countOnes;
+
+    /**
+     * Конструктор класу, який отримує від користувача вхідні дані та обчислює кількість одиниць.
+     */
+    public ViewTable() {
+        getInputAndCalculate();
+        // Додаємо команду у історію при створенні екземпляру класу
+        CommandHistory.getInstance().add(this);
+    }
+
+    private void getInputAndCalculate() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Введіть висоту основи трикутника: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Невірне введення. Будь ласка, введіть ціле число.");
+            scanner.next(); // Пропускаємо некоректний ввід
+        }
+        this.baseHeight = scanner.nextInt();
+
+        System.out.print("Введіть довжину сторони прямокутника: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Невірне введення. Будь ласка, введіть ціле число.");
+            scanner.next(); // Пропускаємо некоректний ввід
+        }
+        this.rectangleLength = scanner.nextInt();
+
+        this.countOnes = countOnesInBinary(this.baseHeight, this.rectangleLength);
+    }
+
+    @Override
+    public void viewHeader() {
+        System.out.println();
+        System.out.println(" ┌──────────────────────────┬──────────────────────────────┬───────────────────────┐");
+        System.out.println(" │ Висота основи трикутника │ Довжина сторони прямокутника │ Кількість одиниць     │");
+        System.out.println(" ├──────────────────────────┼──────────────────────────────┼───────────────────────┤");
+    }
+
+    @Override
+    public void viewBody() {
+        System.out.printf(" │ %24d │ %28d │ %21d │%n", baseHeight, rectangleLength, countOnes);
+    }
+
+    @Override
+    public void viewFooter() {
+        System.out.println(" └──────────────────────────┴──────────────────────────────┴───────────────────────┘");
+    }
+
+    @Override
+    public void viewShow() {
+        viewHeader();
+        viewBody();
+        viewFooter();
+    }
+
+    /**
+     * Метод для обчислення кількості одиниць у двійковому представленні суми периметрів.
+     *
+     * @param baseHeight      висота основи трикутника
+     * @param rectangleLength довжина сторони прямокутника
+     * @return кількість одиниць у двійковому представленні суми периметрів
+     */
+    public static int countOnesInBinary(int baseHeight, int rectangleLength) {
+        int perimeterTriangle = 2 * (baseHeight + (int) Math.sqrt(Math.pow(baseHeight, 2) + Math.pow(rectangleLength / 2, 2)));
+        int perimeterRectangle = 2 * (rectangleLength + baseHeight);
+        int sum = perimeterTriangle + perimeterRectangle;
+        String binary = Integer.toBinaryString(sum);
+        int countOnes = 0;
+        for (char c : binary.toCharArray()) {
+            if (c == '1') {
+                countOnes++;
+            }
+        }
+        System.out.print("Двійковий вигляд: " + binary);
+        
+        return countOnes;
+    }
+
+    @Override
+    public void execute() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введіть команду (1 - ввести нові дані, інше - показати таблицю):");
+        String command = scanner.nextLine();
+        if (command.equals("1")) {
+            getInputAndCalculate(); // Введення нових даних
+            // Додаємо команду у історію після введення нових даних
+            CommandHistory.getInstance().add(this);
+        } else {
+            // Додавання команди у історію
+            CommandHistory.getInstance().add(this);
+            // Виконання відображення
+            viewShow();
+        }
+    }
+    
+    @Override
+    public void undo() {
+        // Скасовуємо останнє введення, просто очищаючи дані та запитуючи їх знову
+        this.baseHeight = 0;
+        this.rectangleLength = 0;
+        this.countOnes = 0;
+        getInputAndCalculate(); // Знову отримуємо дані
+        viewShow(); // Показуємо оновлені результати
+    }
+}
+
+
+```
+### Приклад роботи програми:
+![](screenshot/ex5.png)
+### Успішно виконане тестування:
+![](screenshot/test_ex5.png)
