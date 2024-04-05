@@ -1144,3 +1144,218 @@ public class ViewTable implements View, Command, Serializable {
 ![](screenshot/ex5.png)
 ### Успішно виконане тестування:
 ![](screenshot/test_ex5.png)
+
+## Завдання 6
+Main
+```java
+package ex6;
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ViewTable viewTable1 = new ViewTable();
+        ViewTable viewTable2 = new ViewTable();
+
+        // Створення потоків для паралельної обробки
+        Thread thread1 = new Thread(() -> {
+            System.out.println("---------------");
+            System.out.println("Середнє значення периметрів для першого: " + viewTable1.calculateAverage());
+            System.out.println("Мінімальне число для першого: " + viewTable1.calculateMinimum());
+            System.out.println("Максимум число для першого: " + viewTable1.calculateMaximum());
+            System.out.println("Сума периметрів для першого: " + viewTable1.calculateSum());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println("Середнє значення периметрів для другого: " + viewTable2.calculateAverage());
+            System.out.println("Мінімальне число для другого: " + viewTable2.calculateMinimum());
+            System.out.println("Максимум число для другого: " + viewTable2.calculateMaximum());
+            System.out.println("Сума периметрів для другого: " + viewTable2.calculateSum());
+
+            System.out.println("---------------");
+        });
+
+        // Запуск потоків
+        thread1.start();
+        thread2.start();
+
+        try {
+            // Очікування завершення потоків
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        boolean running = true;
+        while (running) {
+            System.out.println("\nМеню:");
+            System.out.println("1. Відобразити таблицю");
+            System.out.println("2. Повторити введення");
+            System.out.println("3. Скасувати останнє введення");
+            System.out.println("4. Вийти");
+
+            System.out.print("Виберіть опцію: ");
+            int choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    viewTable1.viewShow();
+                    viewTable2.viewShow();
+                    break;
+                case 2:
+                    viewTable1.execute();
+                    break;
+                case 3:
+                    viewTable1.undo();
+                    break;
+                case 4:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Невідома опція. Спробуйте ще раз.");
+            }
+        }
+
+        scanner.close();
+    }
+}
+
+```
+
+ViewTable
+```java
+package ex6;
+
+import java.util.Scanner;
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class ViewTable implements View, Command, Serializable {
+    private static final long serialVersionUID = 1L;
+    private int baseHeight;
+    private int rectangleLength;
+    private int countOnes;
+
+    public ViewTable() {
+        getInputAndCalculate();
+        CommandHistory.getInstance().add(this);
+    }
+
+    private void getInputAndCalculate() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Введіть висоту основи трикутника: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Невірне введення. Будь ласка, введіть ціле число.");
+            scanner.next(); 
+        }
+        this.baseHeight = scanner.nextInt();
+
+        System.out.print("Введіть довжину сторони прямокутника: ");
+        while (!scanner.hasNextInt()) {
+            System.out.println("Невірне введення. Будь ласка, введіть ціле число.");
+            scanner.next();
+        }
+        this.rectangleLength = scanner.nextInt();
+
+        this.countOnes = countOnesInBinary(this.baseHeight, this.rectangleLength);
+    }
+
+    @Override
+    public void viewHeader() {
+        System.out.println();
+        System.out.println(" ┌──────────────────────────┬──────────────────────────────┬───────────────────────┐");
+        System.out.println(" │ Висота основи трикутника │ Довжина сторони прямокутника │ Кількість одиниць     │");
+        System.out.println(" ├──────────────────────────┼──────────────────────────────┼───────────────────────┤");
+    }
+
+    @Override
+    public void viewBody() {
+        System.out.printf(" │ %24d │ %28d │ %21d │%n", baseHeight, rectangleLength, countOnes);
+    }
+
+    @Override
+    public void viewFooter() {
+        System.out.println(" └──────────────────────────┴──────────────────────────────┴───────────────────────┘");
+    }
+
+    @Override
+    public void viewShow() {
+        viewHeader();
+        viewBody();
+        viewFooter();
+    }
+
+    public double calculateAverage() {
+        int perimeterTriangle = 2 * (baseHeight + (int) Math.sqrt(Math.pow(baseHeight, 2) + Math.pow(rectangleLength / 2, 2)));
+        int perimeterRectangle = 2 * (rectangleLength + baseHeight);
+        return (perimeterTriangle + perimeterRectangle) / 2.0;
+    }
+
+    public int calculateMinimum() {
+        return Arrays.stream(new int[]{baseHeight, rectangleLength, countOnes}).min().orElse(0);
+    }
+
+    public int calculateMaximum() {
+        return Arrays.stream(new int[]{baseHeight, rectangleLength, countOnes}).max().orElse(0);
+    }
+
+    public int calculateSum() {
+        int perimeterTriangle = 2 * (baseHeight + (int) Math.sqrt(Math.pow(baseHeight, 2) + Math.pow(rectangleLength / 2, 2)));
+        int perimeterRectangle = 2 * (rectangleLength + baseHeight);
+        return(perimeterTriangle + perimeterRectangle);
+    }
+
+    public static int countOnesInBinary(int baseHeight, int rectangleLength) {
+        int perimeterTriangle = 2 * (baseHeight + (int) Math.sqrt(Math.pow(baseHeight, 2) + Math.pow(rectangleLength / 2, 2)));
+        int perimeterRectangle = 2 * (rectangleLength + baseHeight);
+        int sum = perimeterTriangle + perimeterRectangle;
+        String binary = Integer.toBinaryString(sum);
+        int countOnes = 0;
+        for (char c : binary.toCharArray()) {
+            if (c == '1') {
+                countOnes++;
+            }
+        }
+        System.out.print("Двійковий вигляд: " + binary + "\n");
+        System.out.print("Кількість одиниць: " + countOnes + "\n");
+        
+        return countOnes;
+    }
+
+    @Override
+    public void execute() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введіть команду (1 - ввести нові дані, інше - показати таблицю):");
+        String command = scanner.nextLine();
+        if (command.equals("1")) {
+            Main.main(null);
+            CommandHistory.getInstance().add(this);
+        } else {
+            CommandHistory.getInstance().add(this);
+            viewShow();
+        }
+    }
+    
+    @Override
+    public void undo() {
+        this.baseHeight = 0;
+        this.rectangleLength = 0;
+        this.countOnes = 0;
+        Main.main(null);
+    }
+}
+
+
+
+```
+### Приклад роботи програми:
+1.
+![](screenshot/ex6.png)
+
+2.
+
+![](screenshot/ex6v2.png)
+### Успішно виконане тестування:
+![](screenshot/Test_ex6.png)
