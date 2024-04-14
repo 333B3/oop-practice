@@ -1426,3 +1426,11 @@ public class GUI extends JFrame {
     }
 }
 ```
+### Приклад роботи програми:
+
+1.
+![](screenshot/7-4.png)
+
+2.
+![](screenshot/7-2.png)
+
